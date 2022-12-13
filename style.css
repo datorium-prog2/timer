@@ -1,0 +1,29 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.timer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    gap: 40px;
+}
+
+.timer__time {
+    display: flex;
+    gap: 15px;
+}
+
+.timer__box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid grey;
+    padding: 8px;
+    border-radius: 10px;
+}
