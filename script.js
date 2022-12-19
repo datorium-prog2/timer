@@ -1,7 +1,9 @@
 class Timer {
+  // iesetojam konstanti
   secondsInOneMinute = 60
 
-  constructor(containerSelector) {
+  // constructor izpildīsies vienu reizi sākumā
+  constructor(containerSelector, time) {
     // paņemsim wrapper elementu no dokumenta objekta
     this.timerWrapper = document.querySelector(containerSelector)
 
@@ -10,18 +12,43 @@ class Timer {
     this.stopButton = this.timerWrapper.querySelector('.js-stop')
     this.minutesLeftElement = this.timerWrapper.querySelector('.js-minutes')
     this.secondsLeftElement = this.timerWrapper.querySelector('.js-seconds')
+    this.audioAlarm = this.timerWrapper.querySelector('.js-audio')
+    this.resetButton = this.timerWrapper.querySelector('.js-reset')
 
     // intervāla identifikators, lai varētu viņu vēlāk apturēt
     this.intervalId = null
+    // izveidosim mainīgo, kas glabā orģinālo sekunžu skaitu, kuru nemainīsim
+    this.timerLength = time
 
-    // sākumā uz lapas ielādi ir 10min, jeb 600s
-    this.cuurentTimeInSeconds = 600
+    // izveidojam mainīgo, kurā būs esošais laiks, kuru var mainīt
+    this.cuurentTimeInSeconds = this.timerLength
 
     // aizpildam HTML ar MM un SS vērtībām
     this.setMinutesAndSeconds()
 
-    // izsaucam metodi, kura pieliek pogām click eventu
+    // izsaucam metodi, kura pieliek start pogai click eventu
     this.addStartEvent()
+    // izsaucam metodi, kura pieliek klāt pogai click eventu
+    this.addResetEvent()
+  }
+
+  addResetEvent() {
+    this.resetButton.addEventListener('click', () => {
+        this.resetTimerTime()
+        this.clearCurrentInterval()
+        this.setMinutesAndSeconds()
+        this.audioAlarm.pause()
+    })
+  }
+
+  resetTimerTime() {
+    // uzliekam laiku uz orģināli klasei padoto laiku
+    this.cuurentTimeInSeconds = this.timerLength
+  }
+
+  playAlarm() {
+    // spēlējam alarmu
+    this.audioAlarm.play()
   }
 
   addStartEvent() {
@@ -41,8 +68,19 @@ class Timer {
   setCurrentInterval() {
     // izveidojam intervālu, kurš skaita katras 1000ms jeb sekundi
     this.intervalId = setInterval(() => {
-      // samazinam laiku par vienu sekundi
-      this.cuurentTimeInSeconds = this.cuurentTimeInSeconds - 1
+
+      // ja timeris ir nulle tad
+      if(this.cuurentTimeInSeconds === 0) {
+        // spēlējam alarmu
+        this.playAlarm()
+        // apturam intervālu
+        this.clearCurrentInterval()
+        // atjaunojam laiku taimerim uz sākuma
+        this.resetTimerTime()
+      } else {
+        // samazinam laiku par vienu sekundi
+        this.cuurentTimeInSeconds = this.cuurentTimeInSeconds - 1
+      }
       // liekam klasei atkal iesetot aktuālās sekundes
       this.setMinutesAndSeconds()
     }, 1000)   
@@ -85,12 +123,8 @@ class Timer {
 }
 
 // Enkapsukēsim visu timeri zem viena wrappera
-const timer = new Timer('.js-timer')
+const timer = new Timer('.js-timer', 600)
 
 
-// Kas notiek, kad timeris sasniedz 0 sekundes
-// Var atkārtoti spaidīt start pogu
 // Reset opciju ieviest
 // ievadīt savu laiku
-// kaut kāds paziņojums, tad kad laiks ir beidzies
-//
